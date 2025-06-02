@@ -61,7 +61,9 @@ if __name__ == '__main__':
     print("Length of documents: ", len(documents))
 
     # Q.1 - version.build.hash: "c6b8d8d951c631db715485edc1a74190cdce4189"
-    print(f"Q1. version.build.hash: \"c6b8d8d951c631db715485edc1a74190cdce4189\"")
+    info = es.info()
+    build_hash = info['version']['build_hash']
+    print(f"Q1. version.build.hash: {build_hash}")
 
     # Q.2: Index
     print(f"Q2. the 'index' function adds data to elasticsearch")
