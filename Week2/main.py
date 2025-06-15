@@ -74,8 +74,8 @@ if __name__ == '__main__':
     #Q5. - Selecting the embedding model
     len_embedding_model = len(list(embedding_model.embed(['Test']))[0])
     len_second_embedding_model = len(list(second_embedding_model.embed(['Test']))[0])
-    print('Q5. - model = jinaai/jina-embeddings-v2-small-en', ':', len_embedding_model)
-    print('      model = BAAI/bge-small-en                 ', ':', len_second_embedding_model)
+    print('Q5. - ', 'model = jinaai/jina-embeddings-v2-small-en', ':', len_embedding_model)
+    print('      ', 'model = BAAI/bge-small-en                 ', ':', len_second_embedding_model)
 
     #Q6. - Indexing with qdrant -> see qdrant_work.py
     course_embeddings = list(second_embedding_model.embed([doc['question'] + ' ' + doc['text'] for doc in course_documents]))
@@ -84,4 +84,4 @@ if __name__ == '__main__':
         upsert_to_collection('course_documents', e, idx)
     base_embedding = list(second_embedding_model.embed(initial_documents))
     cd_similarities = [np.dot(base_embedding[0].tolist(), text_embed) for text_embed in course_embeddings]
-    print('Q6. - Highest similarity: ', max(cd_similarities))
+    print('Q6. - ', 'Highest similarity:', max(cd_similarities))
