@@ -1,6 +1,21 @@
 from fastembed import TextEmbedding
 import numpy as np
+import requests
+from qdrant_work import create_collection, upsert_to_collection
 
+docs_url = 'https://github.com/alexeygrigorev/llm-rag-workshop/raw/main/notebooks/documents.json'
+docs_response = requests.get(docs_url)
+documents_raw = docs_response.json()
+course_documents = []
+
+for course in documents_raw:
+    course_name = course['course']
+    if course_name != 'machine-learning-zoomcamp':
+        continue
+
+    for doc in course['documents']:
+        doc['course'] = course_name
+        course_documents.append(doc)
 
 embedding_model = TextEmbedding(model_name='jinaai/jina-embeddings-v2-small-en')
 second_embedding_model = TextEmbedding(model_name='BAAI/bge-small-en')
@@ -62,6 +77,11 @@ if __name__ == '__main__':
     print('Q5. - model = jinaai/jina-embeddings-v2-small-en', ':', len_embedding_model)
     print('      model = BAAI/bge-small-en                 ', ':', len_second_embedding_model)
 
-    #Q6. - Indexing with qdrant(2 points)
-
-    print('Q6. - ')
+    #Q6. - Indexing with qdrant -> see qdrant_work.py
+    course_embeddings = list(second_embedding_model.embed([doc['question'] + ' ' + doc['text'] for doc in course_documents]))
+    create_collection('course_documents', len_second_embedding_model)
+    for idx, e in enumerate(course_embeddings):
+        upsert_to_collection('course_documents', e, idx)
+    base_embedding = list(second_embedding_model.embed(initial_documents))
+    cd_similarities = [np.dot(base_embedding[0].tolist(), text_embed) for text_embed in course_embeddings]
+    print('Q6. - Highest similarity: ', max(cd_similarities))
